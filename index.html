@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>AzaadAI Insights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --ink: #000; --paper: #fff; --a1: #0d0d0d; --a2: #161616; --a3: #262626; --a4: #3d3d3d; --a5: #8a8a8a; --a6: #b5b5b5;
+  --blue: #003cff; --blue-soft: #3d6bff; --gold: #d4a64a; --red: #ff6b6b; --green: #5fcf8a;
+  --dim: rgba(255,255,255,.62); --faint: rgba(255,255,255,.4);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--ink); color: var(--paper); }
+body { font: 14px/1.5 Inter, ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+header { position: sticky; top: 0; z-index: 5; background: rgba(0,0,0,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--a3); }
+header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 56px; }
+.brand { display: flex; align-items: baseline; gap: 10px; font-weight: 700; letter-spacing: -.02em; font-size: 16px; }
+.brand small { font-weight: 500; color: var(--faint); font-size: 12px; letter-spacing: 0; }
+.label { font: 500 10.5px/1.2 "JetBrains Mono", monospace; text-transform: uppercase; letter-spacing: .09em; color: var(--faint); }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 16px 0 8px; }
+.seg { display: inline-flex; border: 1px solid var(--a3); border-radius: 4px; overflow: hidden; }
+.seg button { background: none; border: 0; padding: 5px 10px; font-size: 12.5px; color: var(--dim); cursor: pointer; }
+.seg button.on { background: var(--paper); color: var(--ink); font-weight: 600; }
+.chk { display: inline-flex; gap: 6px; align-items: center; font-size: 12.5px; color: var(--dim); cursor: pointer; }
+input.search, input.key { background: var(--a1); border: 1px solid var(--a3); border-radius: 4px; padding: 6px 10px; font-size: 13px; min-width: 0; }
+input.search { flex: 1 1 200px; }
+input:focus, textarea:focus { outline: none; border-color: rgba(255,255,255,.55); }
+.btn { background: none; border: 1px solid var(--a3); border-radius: 4px; padding: 5px 10px; font-size: 12.5px; cursor: pointer; color: var(--dim); }
+.btn:hover { color: var(--paper); border-color: var(--a4); }
+.btn.primary { background: var(--paper); color: var(--ink); border-color: var(--paper); font-weight: 600; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--a3); border: 1px solid var(--a3); border-radius: 6px; overflow: hidden; margin: 12px 0 28px; }
+.kpi { background: var(--ink); padding: 14px 14px 12px; }
+.kpi .v { font-size: 28px; font-weight: 700; letter-spacing: -.03em; line-height: 1.1; margin-top: 6px; }
+.kpi .s { font-size: 11.5px; color: var(--faint); margin-top: 2px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+@media (max-width: 900px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+section { margin-bottom: 36px; }
+h2 { font-size: 20px; letter-spacing: -.02em; margin: 0 0 4px; }
+.sub { color: var(--faint); font-size: 12.5px; margin: 0 0 14px; }
+.bars { display: flex; flex-direction: column; gap: 6px; }
+.bar { display: grid; grid-template-columns: minmax(90px, 160px) 1fr 40px; gap: 10px; align-items: center; font-size: 12.5px; cursor: pointer; border-radius: 3px; }
+.bar:hover .name { color: var(--paper); }
+.bar.on .name { color: var(--paper); font-weight: 600; }
+.bar .name { color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar .track { height: 8px; background: var(--a2); border-radius: 2px; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--paper); }
+.bar .n { text-align: right; font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: var(--faint); }
+.chart { width: 100%; height: 150px; display: block; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.card { border: 1px solid var(--a3); border-radius: 6px; padding: 14px; background: var(--a1); display: flex; flex-direction: column; gap: 8px; cursor: pointer; }
+.card:hover { border-color: var(--a4); }
+.card .q { font-size: 14.5px; font-weight: 600; line-height: 1.35; }
+.card .why { font-size: 12.5px; color: var(--dim); }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag { font: 500 10.5px/1 "JetBrains Mono", monospace; padding: 4px 6px; border-radius: 3px; background: rgba(255,255,255,.07); color: rgba(255,255,255,.75); }
+.tag.gold { background: rgba(212,166,74,.16); color: var(--gold); }
+.tag.blue { background: rgba(0,60,255,.25); color: #a9bcff; }
+.tag.red { background: rgba(255,107,107,.14); color: var(--red); }
+.tag.green { background: rgba(95,207,138,.14); color: var(--green); }
+.dots { letter-spacing: 1px; color: var(--gold); font-size: 11px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font: 500 10.5px "JetBrains Mono", monospace; text-transform: uppercase; letter-spacing: .08em; color: var(--faint); padding: 8px 8px; border-bottom: 1px solid var(--a3); white-space: nowrap; }
+td { padding: 9px 8px; border-bottom: 1px solid var(--a2); vertical-align: top; }
+tr.row { cursor: pointer; }
+tr.row:hover td { background: var(--a1); }
+td.when { white-space: nowrap; color: var(--faint); font-family: "JetBrains Mono", monospace; font-size: 11.5px; }
+td.qcell { width: 55%; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--a3); border-radius: 6px; }
+.detail { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.75); display: flex; justify-content: flex-end; }
+.detail .panel { width: min(640px, 100%); height: 100%; overflow-y: auto; background: var(--a1); border-left: 1px solid var(--a3); padding: 20px 20px 40px; }
+.detail h3 { font-size: 19px; line-height: 1.3; letter-spacing: -.015em; margin: 6px 0 12px; }
+.answer { white-space: pre-wrap; font-size: 13px; color: rgba(255,255,255,.8); background: var(--ink); border: 1px solid var(--a3); border-radius: 4px; padding: 12px; max-height: 360px; overflow-y: auto; }
+.kv { display: grid; grid-template-columns: 130px 1fr; gap: 4px 12px; font-size: 12.5px; margin: 12px 0; }
+.kv div:nth-child(odd) { color: var(--faint); }
+textarea { width: 100%; min-height: 70px; background: var(--ink); border: 1px solid var(--a3); border-radius: 4px; padding: 8px; font-size: 13px; }
+.gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.gate form { width: min(420px, 100%); display: flex; flex-direction: column; gap: 14px; }
+.gate h1 { font-size: 44px; letter-spacing: -.05em; margin: 0; line-height: .95; }
+.err { color: var(--red); font-size: 13px; }
+.empty { color: var(--faint); font-size: 13px; padding: 12px 0; }
+.star { background: none; border: 0; cursor: pointer; font-size: 16px; color: var(--a4); padding: 0 2px; }
+.star.on { color: var(--gold); }
+.filterchip { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; background: rgba(0,60,255,.25); color: #c8d4ff; border-radius: 3px; padding: 3px 8px; }
+.filterchip button { background: none; border: 0; cursor: pointer; color: inherit; padding: 0; }
+footer { color: var(--faint); font-size: 12px; padding: 24px 0 40px; border-top: 1px solid var(--a3); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const GATEWAY = "https://sehajr-singhs--azaad-gateway-web.us-east.modal.run";
+const KEY_STORE = "azaadai-owner";
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const store = {
+  get(k) { try { return localStorage.getItem(k) || ""; } catch { return ""; } },
+  set(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} },
+};
+
+const CAT_LABEL = {
+  "concept": "Concepts & definitions", "history": "History", "economics": "Economics", "governance-law": "Governance & law",
+  "sikhi-theology": "Sikhi & theology", "strategy-dharam-yudh": "Strategy & Dharam Yudh", "comparison-critique": "Comparison & critique",
+  "personal-application": "Personal application", "current-events": "Current events", "about-azaadai": "About AzaadAI", "off-topic": "Off-topic",
+};
+const COV_LABEL = { "covered": "Answered by the texts", "partial": "Partly answered", "not-covered": "Not in the framework" };
+
+const S = {
+  key: store.get(KEY_STORE), rows: [], loading: false, error: "",
+  days: 30, tier: "all", hideOwner: true, q: "", cat: "", topic: "", cov: "", stance: "", onlyStarred: false, open: null,
+};
+
+async function api(path, opts = {}) {
+  const r = await fetch(GATEWAY + path, { ...opts, headers: { "content-type": "application/json", "x-azaad-owner": S.key, ...(opts.headers || {}) } });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error?.message || `${r.status} ${r.statusText}`);
+  return j;
+}
+
+async function load() {
+  S.loading = true; S.error = ""; render();
+  try {
+    const j = await api(`/v1/admin/analytics?days=${S.days}`);
+    S.rows = j.rows || [];
+  } catch (e) {
+    S.error = e.message;
+    if (/Owner key/.test(e.message)) { S.key = ""; store.set(KEY_STORE, ""); }
+  }
+  S.loading = false; render();
+}
+
+function filtered() {
+  const q = S.q.trim().toLowerCase();
+  return S.rows.filter((r) => {
+    if (S.hideOwner && r.owner) return false;
+    if (S.tier !== "all" && r.tier !== S.tier) return false;
+    if (S.onlyStarred && !r.starred) return false;
+    const c = r.cls || {};
+    if (S.cat && c.category !== S.cat) return false;
+    if (S.cov && c.coverage !== S.cov) return false;
+    if (S.stance && c.stance !== S.stance) return false;
+    if (S.topic && !(c.topics || []).includes(S.topic)) return false;
+    if (q && !`${r.question} ${c.summary || ""} ${(c.topics || []).join(" ")} ${r.note || ""}`.toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+const median = (xs) => { const a = xs.filter((x) => x != null).sort((x, y) => x - y); return a.length ? a[Math.floor(a.length / 2)] : null; };
+const pct = (a, b) => (b ? Math.round((100 * a) / b) + "%" : "–");
+const secs = (ms) => (ms == null ? "–" : (ms / 1000).toFixed(ms < 10000 ? 1 : 0) + "s");
+const count = (xs) => { const m = new Map(); xs.forEach((x) => x && m.set(x, (m.get(x) || 0) + 1)); return [...m].sort((a, b) => b[1] - a[1]); };
+const when = (ts) => { const d = new Date(ts * 1000); return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) + " " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }); };
+
+function bars(entries, key, labels = {}, tone = "") {
+  if (!entries.length) return `<p class="empty">Nothing yet.</p>`;
+  const max = Math.max(...entries.map((e) => e[1]));
+  return `<div class="bars">${entries.map(([k, n]) => `
+    <div class="bar ${S[key] === k ? "on" : ""}" data-filter="${key}" data-value="${esc(k)}" title="Filter by ${esc(labels[k] || k)}">
+      <span class="name">${esc(labels[k] || k)}</span>
+      <span class="track"><span class="fill" style="width:${(100 * n) / max}%;${tone ? `background:${tone}` : ""}"></span></span>
+      <span class="n">${n}</span>
+    </div>`).join("")}</div>`;
+}
+
+function dayChart(rows) {
+  const days = S.days > 0 ? S.days : Math.max(7, Math.ceil((Date.now() / 1000 - Math.min(...rows.map((r) => r.ts), Date.now() / 1000)) / 86400) + 1);
+  const n = Math.min(days, 120);
+  const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - (n - 1));
+  const buckets = Array.from({ length: n }, () => ({ pub: 0, res: 0 }));
+  rows.forEach((r) => {
+    const i = Math.floor((r.ts * 1000 - start.getTime()) / 86400000);
+    if (i >= 0 && i < n) buckets[i][r.tier === "research" ? "res" : "pub"]++;
+  });
+  const max = Math.max(1, ...buckets.map((b) => b.pub + b.res));
+  const W = 1000, H = 150, gap = 2, bw = W / n - gap;
+  const rects = buckets.map((b, i) => {
+    const x = i * (W / n), hp = (b.pub / max) * (H - 20), hr = (b.res / max) * (H - 20);
+    const d = new Date(start.getTime() + i * 86400000).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    return `<g><title>${d}: ${b.pub} public, ${b.res} research</title>
+      <rect x="${x}" y="${H - hp}" width="${bw}" height="${hp}" fill="#fff"/>
+      <rect x="${x}" y="${H - hp - hr}" width="${bw}" height="${hr}" fill="#3d6bff"/></g>`;
+  }).join("");
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Questions per day">${rects}
+    <line x1="0" y1="${H - 0.5}" x2="${W}" y2="${H - 0.5}" stroke="#262626"/></svg>
+    <div style="display:flex;justify-content:space-between" class="label"><span>${start.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
+    <span><span style="color:#fff">■</span> public &nbsp; <span style="color:#3d6bff">■</span> research &nbsp; peak ${max}/day</span><span>today</span></div>`;
+}
+
+function interestDots(n) { return `<span class="dots" title="interest ${n}/5">${"●".repeat(n)}<span style="color:#3d3d3d">${"●".repeat(5 - n)}</span></span>`; }
+
+function card(r) {
+  const c = r.cls || {};
+  return `<div class="card" data-open="${esc(r.id)}">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
+      <span class="tags">${c.interest ? interestDots(c.interest) : ""}${r.tier === "research" ? `<span class="tag blue">research</span>` : ""}${c.stance === "skeptical" || c.stance === "hostile" ? `<span class="tag red">${c.stance}</span>` : ""}${c.coverage === "not-covered" ? `<span class="tag gold">gap</span>` : ""}</span>
+      <span class="label">${when(r.ts)}</span>
+    </div>
+    <div class="q">${esc(r.question.length > 220 ? r.question.slice(0, 220) + "…" : r.question)}</div>
+    ${c.why ? `<div class="why">${esc(c.why)}</div>` : ""}
+    <div class="tags">${(c.topics || []).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+  </div>`;
+}
+
+function render() {
+  const app = $("#app");
+  if (!S.key) {
+    app.innerHTML = `<div class="gate"><form id="gate">
+      <span class="label">Bunga Azaadi · private</span>
+      <h1>AzaadAI<br/>Insights.</h1>
+      <p style="color:var(--dim);margin:0">What people are asking AzaadAI, classified by the model itself. Owner key only.</p>
+      <input class="key mono" id="key" type="password" placeholder="Owner key" autocomplete="off" autofocus />
+      ${S.error ? `<p class="err">${esc(S.error)}</p>` : ""}
+      <button class="btn primary" type="submit">Open</button>
+    </form></div>`;
+    $("#gate").onsubmit = (e) => { e.preventDefault(); S.key = $("#key").value.trim(); if (S.key) { store.set(KEY_STORE, S.key); load(); } };
+    return;
+  }
+
+  const all = S.rows.filter((r) => !(S.hideOwner && r.owner) && (S.tier === "all" || r.tier === S.tier));
+  const rows = filtered();
+  const done = rows.filter((r) => r.answer_chars > 0);
+  const classified = rows.filter((r) => r.cls);
+  const visitors = new Set(rows.map((r) => r.visitor)).size;
+  const research = rows.filter((r) => r.tier === "research").length;
+  const cited = done.filter((r) => (r.cited || []).length > 0).length;
+  const gaps = classified.filter((r) => r.cls.coverage === "not-covered").length;
+  const failed = rows.filter((r) => r.error || r.aborted).length;
+  const followups = rows.filter((r) => r.turn > 1).length;
+
+  const highlights = classified.filter((r) => r.starred || r.cls.interest >= 4)
+    .sort((a, b) => (b.starred - a.starred) || (b.cls.interest - a.cls.interest) || (b.ts - a.ts)).slice(0, 12);
+  const gapRows = classified.filter((r) => r.cls.coverage !== "covered").sort((a, b) => (a.cls.coverage === "not-covered" ? -1 : 1) - (b.cls.coverage === "not-covered" ? -1 : 1) || b.ts - a.ts);
+  const gapTopics = count(gapRows.flatMap((r) => r.cls.topics || [])).slice(0, 10);
+  const citedPapers = count(done.flatMap((r) => r.cited_papers || [])).slice(0, 10);
+
+  const chips = [["cat", CAT_LABEL], ["topic", {}], ["cov", COV_LABEL], ["stance", {}]].filter(([k]) => S[k])
+    .map(([k, L]) => `<span class="filterchip">${esc(L[S[k]] || S[k])}<button data-clear="${k}" aria-label="Clear">×</button></span>`).join("");
+
+  app.innerHTML = `
+  <header><div class="wrap">
+    <div class="brand">AzaadAI Insights <small>private · ${esc(GATEWAY.replace("https://", "").split(".")[0])}</small></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="reload">${S.loading ? "Loading…" : "Refresh"}</button>
+      <button class="btn" id="csv">Export CSV</button>
+      <button class="btn" id="lock">Lock</button>
+    </div>
+  </div></header>
+  <main class="wrap">
+    <div class="controls">
+      <div class="seg">${[[7, "7d"], [30, "30d"], [90, "90d"], [0, "All"]].map(([d, l]) => `<button data-days="${d}" class="${S.days === d ? "on" : ""}">${l}</button>`).join("")}</div>
+      <div class="seg">${[["all", "All tiers"], ["public", "Public"], ["research", "Research"]].map(([t, l]) => `<button data-tier="${t}" class="${S.tier === t ? "on" : ""}">${l}</button>`).join("")}</div>
+      <label class="chk"><input type="checkbox" id="hideOwner" ${S.hideOwner ? "checked" : ""}/> Hide my own tests</label>
+      <label class="chk"><input type="checkbox" id="starred" ${S.onlyStarred ? "checked" : ""}/> Starred only</label>
+      <input class="search" id="q" placeholder="Search questions, topics, notes" value="${esc(S.q)}" />
+    </div>
+    ${chips ? `<div class="controls" style="padding-top:0">${chips}</div>` : ""}
+    ${S.error ? `<p class="err">${esc(S.error)}</p>` : ""}
+
+    <div class="kpis">
+      <div class="kpi"><div class="label">Questions</div><div class="v">${rows.length}</div><div class="s">${followups} were follow-ups</div></div>
+      <div class="kpi"><div class="label">Visitors</div><div class="v">${visitors}</div><div class="s">distinct per day, no IPs kept</div></div>
+      <div class="kpi"><div class="label">Research tier</div><div class="v">${pct(research, rows.length)}</div><div class="s">${research} questions</div></div>
+      <div class="kpi"><div class="label">First word</div><div class="v">${secs(median(done.map((r) => r.ms_first)))}</div><div class="s">median, full answer ${secs(median(done.map((r) => r.ms)))}</div></div>
+      <div class="kpi"><div class="label">Cited</div><div class="v">${pct(cited, done.length)}</div><div class="s">answers citing a passage</div></div>
+      <div class="kpi"><div class="label">Framework gaps</div><div class="v">${pct(gaps, classified.length)}</div><div class="s">${gaps} not answered by the texts</div></div>
+      <div class="kpi"><div class="label">Failed</div><div class="v">${failed}</div><div class="s">errors or left before the answer</div></div>
+    </div>
+
+    <section>
+      <h2>Questions per day</h2>
+      <p class="sub">Hover a bar for the count.</p>
+      ${rows.length ? dayChart(rows) : `<p class="empty">${S.loading ? "Loading…" : "No questions in this range yet."}</p>`}
+    </section>
+
+    <section>
+      <h2>Worth reading</h2>
+      <p class="sub">The model rates every question 1 to 5 for how much the Institute should see it: sharp objections, gaps, new angles, new audiences. Shown here at 4 and up, plus anything you starred.</p>
+      ${highlights.length ? `<div class="cards">${highlights.map(card).join("")}</div>` : `<p class="empty">No highlighted questions yet.</p>`}
+    </section>
+
+    <section class="grid2">
+      <div>
+        <h2>What people ask about</h2>
+        <p class="sub">Classified by the model after each answer. Click to filter.</p>
+        ${bars(count(classified.map((r) => r.cls.category)), "cat", CAT_LABEL)}
+      </div>
+      <div>
+        <h2>Topics</h2>
+        <p class="sub">The model's own tags, top 14.</p>
+        ${bars(count(classified.flatMap((r) => r.cls.topics || [])).slice(0, 14), "topic")}
+      </div>
+    </section>
+
+    <section class="grid3">
+      <div>
+        <h2>Does the framework answer it?</h2>
+        <p class="sub">Judged from the answer and the papers retrieved.</p>
+        ${bars(count(classified.map((r) => r.cls.coverage)), "cov", COV_LABEL)}
+      </div>
+      <div>
+        <h2>Who's asking</h2>
+        <p class="sub">The asker's apparent stance.</p>
+        ${bars(count(classified.map((r) => r.cls.stance)), "stance")}
+      </div>
+      <div>
+        <h2>Papers cited most</h2>
+        <p class="sub">Documents actually cited in answers.</p>
+        ${citedPapers.length ? `<div class="bars">${citedPapers.map(([k, n]) => `<div class="bar" style="cursor:default"><span class="name" title="${esc(k)}">${esc(k)}</span><span class="track"><span class="fill" style="width:${(100 * n) / citedPapers[0][1]}%;background:var(--gold)"></span></span><span class="n">${n}</span></div>`).join("")}</div>` : `<p class="empty">Nothing yet.</p>`}
+      </div>
+    </section>
+
+    <section>
+      <h2>What the framework doesn't answer yet</h2>
+      <p class="sub">Questions the texts don't (or only partly) settle. This is the list of papers waiting to be written.${gapTopics.length ? ` Most common gap topics: ${gapTopics.map(([t, n]) => `<b>${esc(t)}</b> (${n})`).join(", ")}.` : ""}</p>
+      ${gapRows.length ? `<div class="cards">${gapRows.slice(0, 9).map(card).join("")}</div>` : `<p class="empty">No gaps found yet.</p>`}
+    </section>
+
+    <section>
+      <h2>Every question</h2>
+      <p class="sub">${rows.length} of ${all.length} shown. Click a row for the answer, the papers, notes and actions. ${rows.length - classified.length > 0 ? `${rows.length - classified.length} not classified (still running, or the answer failed).` : ""}</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th></th><th>When</th><th>Question</th><th>Type</th><th>Interest</th><th>Coverage</th><th>Tier</th><th>Time</th></tr></thead>
+        <tbody>${rows.slice(0, 400).map((r) => { const c = r.cls || {}; return `<tr class="row" data-open="${esc(r.id)}">
+          <td><button class="star ${r.starred ? "on" : ""}" data-star="${esc(r.id)}" aria-label="Star">★</button></td>
+          <td class="when">${when(r.ts)}</td>
+          <td class="qcell">${esc(r.question.length > 160 ? r.question.slice(0, 160) + "…" : r.question)}${r.turn > 1 ? ` <span class="tag">follow-up</span>` : ""}${r.owner ? ` <span class="tag">you</span>` : ""}</td>
+          <td style="white-space:nowrap;color:var(--dim)">${esc(CAT_LABEL[c.category] || (r.error ? "error" : r.aborted ? "abandoned" : "…"))}</td>
+          <td>${c.interest ? interestDots(c.interest) : ""}</td>
+          <td>${c.coverage ? `<span class="tag ${c.coverage === "covered" ? "green" : c.coverage === "partial" ? "" : "gold"}">${esc(c.coverage)}</span>` : ""}</td>
+          <td>${r.tier === "research" ? `<span class="tag blue">research</span>` : `<span class="tag">public</span>`}</td>
+          <td class="when">${secs(r.ms)}</td></tr>`; }).join("")}</tbody>
+      </table>${rows.length ? "" : `<p class="empty" style="padding:12px">Nothing matches.</p>`}</div>
+    </section>
+    <footer>Questions are stored on Bunga Azaadi's gateway without names or IP addresses. Visitors are counted with a per-day pseudonym. Deleting a question here removes it for good.</footer>
+  </main>
+  ${S.open ? detail(S.rows.find((r) => r.id === S.open)) : ""}`;
+  bind();
+}
+
+function detail(r) {
+  if (!r) return "";
+  const c = r.cls || {};
+  return `<div class="detail" id="detail"><div class="panel" id="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span class="label">${when(r.ts)} · ${esc(r.tier)}${r.group ? " · " + esc(r.group) : ""}</span>
+      <button class="btn" id="close">Close</button>
+    </div>
+    <h3>${esc(r.question)}</h3>
+    ${r.context ? `<p class="sub">Earlier in the conversation: ${esc(r.context)}</p>` : ""}
+    <div class="tags">${c.interest ? interestDots(c.interest) : ""}${c.category ? `<span class="tag">${esc(CAT_LABEL[c.category] || c.category)}</span>` : ""}${c.coverage ? `<span class="tag gold">${esc(COV_LABEL[c.coverage])}</span>` : ""}${c.stance ? `<span class="tag">${esc(c.stance)}</span>` : ""}${(c.topics || []).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+    ${c.why ? `<p style="color:var(--dim);font-size:13px">${esc(c.why)}</p>` : ""}
+    <div class="kv">
+      <div>First word</div><div>${secs(r.ms_first)}</div>
+      <div>Full answer</div><div>${secs(r.ms)} · ${r.answer_chars || 0} characters</div>
+      <div>Passages read</div><div>${r.sources || 0} from ${(r.papers || []).length} documents</div>
+      <div>Cited</div><div>${(r.cited_papers || []).map(esc).join("; ") || "nothing"}</div>
+      <div>Council</div><div>${r.council ? "on" : "off"}</div>
+      <div>Status</div><div>${r.error ? "error: " + esc(r.error) : r.aborted ? "left before the answer" : "answered"}</div>
+    </div>
+    ${(r.papers || []).length ? `<p class="label">Papers referenced</p><ul style="margin:6px 0 16px;padding-left:18px;font-size:12.5px;color:var(--dim)">${r.papers.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>` : ""}
+    ${r.answer_head ? `<p class="label">Answer${r.answer_chars > 2000 ? " (first 2,000 characters)" : ""}</p><div class="answer">${esc(r.answer_head)}</div>` : ""}
+    <p class="label" style="margin-top:16px">Your note</p>
+    <textarea id="note" placeholder="Why it matters, what to write about it…">${esc(r.note || "")}</textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn primary" id="saveNote">Save note</button>
+      <button class="btn" id="starOne">${r.starred ? "Unstar" : "Star"}</button>
+      <button class="btn" id="del" style="margin-left:auto;color:var(--red)">Delete</button>
+    </div>
+  </div></div>`;
+}
+
+async function mark(id, body) {
+  try {
+    const j = await api("/v1/admin/mark", { method: "POST", body: JSON.stringify({ id, ...body }) });
+    if (j.deleted) { S.rows = S.rows.filter((r) => r.id !== id); S.open = null; }
+    else if (j.row) S.rows = S.rows.map((r) => (r.id === id ? j.row : r));
+  } catch (e) { S.error = e.message; }
+  render();
+}
+
+function csv() {
+  const cols = ["time", "tier", "question", "category", "topics", "coverage", "stance", "interest", "why", "first_s", "total_s", "papers", "cited", "starred", "note"];
+  const q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const lines = filtered().map((r) => { const c = r.cls || {}; return [new Date(r.ts * 1000).toISOString(), r.tier, r.question, c.category, (c.topics || []).join("; "), c.coverage, c.stance, c.interest, c.why,
+    r.ms_first ? (r.ms_first / 1000).toFixed(1) : "", r.ms ? (r.ms / 1000).toFixed(1) : "", (r.papers || []).join("; "), (r.cited_papers || []).join("; "), r.starred ? "yes" : "", r.note].map(q).join(","); });
+  const blob = new Blob([[cols.join(","), ...lines].join("\n")], { type: "text/csv" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `azaadai-questions-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+}
+
+function bind() {
+  document.querySelectorAll("[data-days]").forEach((b) => (b.onclick = () => { S.days = Number(b.dataset.days); load(); }));
+  document.querySelectorAll("[data-tier]").forEach((b) => (b.onclick = () => { S.tier = b.dataset.tier; render(); }));
+  document.querySelectorAll("[data-filter]").forEach((b) => (b.onclick = () => { const k = b.dataset.filter; S[k] = S[k] === b.dataset.value ? "" : b.dataset.value; render(); }));
+  document.querySelectorAll("[data-clear]").forEach((b) => (b.onclick = () => { S[b.dataset.clear] = ""; render(); }));
+  document.querySelectorAll("[data-open]").forEach((el) => (el.onclick = () => { S.open = el.dataset.open; render(); }));
+  document.querySelectorAll("[data-star]").forEach((b) => (b.onclick = (e) => { e.stopPropagation(); const r = S.rows.find((x) => x.id === b.dataset.star); mark(r.id, { starred: !r.starred }); }));
+  const on = (sel, ev, fn) => { const el = $(sel); if (el) el[ev] = fn; };
+  on("#hideOwner", "onchange", (e) => { S.hideOwner = e.target.checked; render(); });
+  on("#starred", "onchange", (e) => { S.onlyStarred = e.target.checked; render(); });
+  on("#q", "oninput", (e) => { S.q = e.target.value; clearTimeout(bind.t); bind.t = setTimeout(() => { const pos = e.target.selectionStart; render(); const i = $("#q"); i.focus(); i.setSelectionRange(pos, pos); }, 250); });
+  on("#reload", "onclick", load);
+  on("#csv", "onclick", csv);
+  on("#lock", "onclick", () => { S.key = ""; S.rows = []; store.set(KEY_STORE, ""); render(); });
+  on("#close", "onclick", () => { S.open = null; render(); });
+  on("#detail", "onclick", (e) => { if (e.target.id === "detail") { S.open = null; render(); } });
+  on("#saveNote", "onclick", () => mark(S.open, { note: $("#note").value }));
+  on("#starOne", "onclick", () => { const r = S.rows.find((x) => x.id === S.open); mark(r.id, { starred: !r.starred }); });
+  on("#del", "onclick", () => { if (confirm("Delete this question for good?")) mark(S.open, { delete: true }); });
+}
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && S.open) { S.open = null; render(); } });
+
+render();
+if (S.key) load();
+</script>
+</body>
+</html>
